@@ -15,5 +15,5 @@ Variety of scripts that do different things.
     - A naive way of determining obfuscation rate of files
     - Composed of 3 parts/scripts: entropy.sh, space_ratio.sh, avg_word_len.sh
     - Uses Git, awk, tr
-4. stale_files (bash)
+4. stale (bash)
     - Caclulates how long has been since the files have been changed. Returns up to 20 most stale files.

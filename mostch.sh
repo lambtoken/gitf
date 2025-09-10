@@ -2,6 +2,16 @@
 
 # Usage: ./mostch.sh <git_repo_path>
 
-# This script lists the top 10 most frequently changed files in a git repo
+if [ -z "$1" ]; then
+  echo "Usage: $0 <git_repo_path>"
+  exit 1
+fi
 
-git log --pretty=format: --name-only | grep -v '^$' | sort | uniq -c | sort -rg | head -10
+cd "$1" || { echo "Error: cannot enter directory $1"; exit 1; }
+
+git log --pretty=format: --name-only \
+  | grep -v '^$' \
+  | sort \
+  | uniq -c \
+  | sort -rg \
+  | head -10

@@ -11,22 +11,27 @@ REPO_PATH="$1"
 SUBDIR="$2"
 
 [ -d "$REPO_PATH" ] || { echo "Invalid git repo path"; exit 1; }
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
 cd "$REPO_PATH" || exit 1
 
 if [ -n "$SUBDIR" ]; then
-	FILES=$(git ls-files "$SUBDIR")
+    FILES=$(git ls-files "$SUBDIR")
 else
-	FILES=$(git ls-files)
+    FILES=$(git ls-files)
 fi
 
 for f in $FILES; do
-	[ -f "$f" ] || continue
+    [ -f "$f" ] || continue
+    [ ! -s "$f" ] && continue   # skip empty files
 
-	# helper scripts
-	entropy=$(bash ./entropy.sh "$f")
-	space_ratio=$(bash ./space_ratio.sh "$f")
-	avg_word_len=$(bash ./avg_word_len.sh "$f")
+    entropy=$("$SCRIPT_DIR/entropy.sh" "$f")
+    space_ratio=$("$SCRIPT_DIR/space_ratio.sh" "$f")
+    avg_word_len=$("$SCRIPT_DIR/avg_word_len.sh" "$f")
 
-	score=$(awk -v e="$entropy" -v s="$space_ratio" -v w="$avg_word_len" 'BEGIN{print (s*2) + (w/5) + (8-e)}')
-	echo "$score $f"
+    score=$(awk -v e="$entropy" -v s="$space_ratio" -v w="$avg_word_len" \
+        'BEGIN { print (s*2) + (w/5) + (8-e) }')
+
+    echo "$score $f"
 done | sort -nr | head -10
